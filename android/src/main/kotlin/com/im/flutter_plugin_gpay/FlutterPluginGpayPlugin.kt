@@ -54,6 +54,8 @@ class FlutterPluginGpayPlugin internal constructor(registrar: Registrar, channel
     val am: String? = call.argument("am")
     val cu: String? = call.argument("cu")
     val url: String? = call.argument("url")
+    val mode: String? = call.argument("mode")
+    val orgid: String? = call.argument("orgid")
 
     try {
       /*
@@ -66,7 +68,9 @@ class FlutterPluginGpayPlugin internal constructor(registrar: Registrar, channel
               "&pn=" + Uri.encode(pn) +
               "&tr=" + Uri.encode(tr) +
               "&am=" + Uri.encode(am) +
-              "&cu=" + Uri.encode(cu)
+              "&cu=" + Uri.encode(cu) +
+              "&mode=" + Uri.encode(mode) +
+              "&orgid=" + Uri.encode(orgid)
       if(url != null) {
         uriStr += ("&url=" + Uri.encode(url))
       }
@@ -76,14 +80,13 @@ class FlutterPluginGpayPlugin internal constructor(registrar: Registrar, channel
       if(tn != null) {
         uriStr += ("&tn=" + Uri.encode(tn))
       }
-      uriStr += "&mode=02" // &orgid=000000"
-      uriStr += "&orgid=000000"
+      //uriStr += "&mode=02" // &orgid=000000"
+      //uriStr += "&orgid=000000"
       var uri = Uri.parse(uriStr)
       Log.d("upi_pay", "initiateTransaction URI: " + uri.toString())
 
       //var signhashed = hashString("SHA-256", uri.toString());
       var signhashed = base64encode(uri.toString());
-
 
       Log.d("upi_pay", "initiateTransaction URI: " + uri.toString() + "&sign=" + signhashed)
 
@@ -149,6 +152,8 @@ class FlutterPluginGpayPlugin internal constructor(registrar: Registrar, channel
       }
 
       result?.success(activityResponse)
+      Log.d("result", result.toString())
+      Log.d("activityResponse", activityResponse.toString())
     } catch (ex: Exception) {
       Log.e("upi_pay", ex.toString())
       result?.error("getInstalledUpiApps", "exception", ex)
@@ -177,17 +182,21 @@ class FlutterPluginGpayPlugin internal constructor(registrar: Registrar, channel
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-    if (requestCodeNumber == requestCode && result != null) {
-      if (data != null) {
-        try {
-          val response = data.getStringExtra("response")!!
-          this.success(response)
-        } catch (ex: Exception) {
-          this.success("invalid_response")
-        }
-      } else {
-        this.success("user_cancelled")
+    Log.d("resultcode", requestCode.toString()+ resultCode.toString() + data?.getStringExtra("response"))
+
+    if (data != null) {
+      try {
+        val response = data.getStringExtra("response")!!
+        this.success(response)
+      } catch (ex: Exception) {
+        this.success("invalid_response")
       }
+    } else {
+      this.success("user_cancelled")
+    }
+
+    if (requestCodeNumber == requestCode && result != null) {
+
     }
     return true
   }

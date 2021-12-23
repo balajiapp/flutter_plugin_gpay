@@ -15,6 +15,8 @@ class TransactionDetails {
   final String? url;
   final String merchantCode;
   final String? transactionNote;
+  final String? mode;
+  final String? orgid;
 
   TransactionDetails({
     required this.upiApplication,
@@ -26,6 +28,8 @@ class TransactionDetails {
     this.url,
     this.merchantCode: '',
     this.transactionNote: 'UPI Transaction',
+    this.mode: '02',
+    this.orgid: '000000',
   }) : amount = Decimal.parse(amount) {
     if (!_checkIfUpiAddressIsValid(payeeAddress)) {
       throw InvalidUpiAddressException();
@@ -56,6 +60,8 @@ class TransactionDetails {
       'url': url,
       'mc': merchantCode,
       'tn': transactionNote,
+      'mode': mode,
+      'orgid': orgid,
     };
   }
 
@@ -65,7 +71,9 @@ class TransactionDetails {
         '&tr=$transactionRef'
         '&tn=${Uri.encodeComponent(transactionNote!)}'
         '&am=${amount.toString()}'
-        '&cu=$currency';
+        '&cu=$currency'
+        '&mode=$mode'
+        '&orgid=$orgid';
     if (url != null && url!.isNotEmpty) {
       uri += '&url=${Uri.encodeComponent(url!)}';
     }

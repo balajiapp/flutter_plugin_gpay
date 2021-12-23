@@ -100,9 +100,11 @@ class _ScreenState extends State<Screen> {
       transactionRef: transactionRef,
       transactionNote: 'UPIPayment',
       //merchantCode: '7372',
+      mode: '02',
+      orgid: '000000',
     );
 
-    print(a);
+    print("flitter response capture" + a.toString());
   }
 
   @override
